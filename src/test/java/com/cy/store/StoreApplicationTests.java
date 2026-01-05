@@ -1,0 +1,27 @@
+package com.cy.store;
+
+import jakarta.annotation.Resource;
+import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.context.SpringBootTest;
+
+import javax.sql.DataSource;
+import java.sql.SQLException;
+
+@SpringBootTest
+class StoreApplicationTests {
+    @Resource
+    private DataSource dataSource;
+
+
+    @Test
+    void getConnection() throws SQLException {
+        System.out.println(dataSource.getConnection());
+    }
+
+
+    @Test
+    void contextLoads() {
+
+    }
+
+}

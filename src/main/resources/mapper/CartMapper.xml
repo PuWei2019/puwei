@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--namespace属性：指定当前文件和哪个接口经行映射，指定完整路径文件路径结构 -->
+<mapper namespace="com.cy.store.mapper.CartMapper">
+    <resultMap id="CartEntityMap" type="com.cy.store.entity.Cart">
+        <!--名称不一致的字段匹配指定 一致可以不写 -->
+        <!--result标签经行匹配 column:表字段 property:java实体类 例:表t_user.is_delete java实体类:user.isDelete -->
+        <!--主键用id 其他用result 完整版需要写id 表示主键 -->
+        <id column="cid" property="cid"/>
+        <result column="created_user" property="createdUser"></result>
+        <result column="created_time" property="createdTime"></result>
+        <result column="modified_user" property="modifiedUser"></result>
+        <result column="modified_time" property="modifiedTime"></result>
+    </resultMap>
+    <insert id="insert" useGeneratedKeys="true" keyProperty="cid">
+        INSERT INTO
+        t_cart (uid, pid, num, price,created_user,created_time,modified_user,modified_time)
+        VALUES
+        (#{uid},#{pid},#{num},#{price},#{createdUser},#{createdTime},#{modifiedUser},#{modifiedTime})
+    </insert>
+
+    <update id="updateNumByCid">
+        UPDATE t_cart
+        SET
+            num = #{num},
+            modified_user = #{modifiedUser},
+            modified_time = #{modifiedTime}
+        WHERE
+            cid = #{cid}
+    </update>
+    <select id="findByUidAndPid" resultMap="CartEntityMap">
+        SELECT
+        *
+        FROM
+        t_cart
+        WHERE
+        uid =#{uid} AND pid = #{pid}
+    </select>
+    
+    <select id="findVOByUid" resultType="com.cy.store.vo.CartVO">
+        SELECT
+        c.cid,
+        c.uid,
+        c.pid,
+        c.price,
+        c.num,
+        p.title,
+        p.image,
+        p.price AS realPrice
+        FROM t_cart c
+        LEFT JOIN t_product p ON c.pid = p.id
+        WHERE c.uid = #{uid}
+        ORDER BY c.created_time DESC
+    </select>
+
+    <select id="findByCid" resultMap="CartEntityMap" resultType="com.cy.store.entity.Cart">
+        SELECT
+        *
+        FROM
+        t_cart
+        WHERE
+        cid = #{cid}
+    </select>
+
+
+    <select id="findVOByCid" resultType="com.cy.store.vo.CartVO">
+        SELECT
+        c.cid,
+        c.uid,
+        c.pid,
+        c.price,
+        c.num,
+        p.title,
+        p.image,
+        p.price AS realPrice
+        FROM t_cart c
+        LEFT JOIN t_product p ON c.pid = p.id
+        WHERE
+        c.cid
+        IN(<foreach collection="array" item="cid" separator=",">
+            #{cid}
+        </foreach>)
+        ORDER BY c.created_time DESC
+    </select>
+
+
+</mapper>
